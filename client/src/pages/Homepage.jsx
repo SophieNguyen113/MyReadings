@@ -6,7 +6,7 @@ export default function Homepage({api_url}) {
       {/* Hero Section */}
       <section className="text-center py-40">
         <h1 className="text-5xl font-bold mb-4">Track, Record, and Share</h1>
-        <p className="text-lg text-white-600 mb-8">Discover, record, and manage your favorite books with Bookfolio</p>
+        <p className="text-lg text-white-600 mb-8">Discover, record, and manage your favorite books with MyReadings</p>
         <button className="group relative overflow-hidden px-10 py-3 mt-5 text-2xl font-bold cursor-pointer bg-white-600 text-white rounded-md outline-offset-4 hover:animate-[rotate-bounce_1s_infinite_ease-in-out]">
           <a
             href={AUTH_URL_LOGIN}
@@ -19,7 +19,7 @@ export default function Homepage({api_url}) {
       
       {/* Feature Section */}
       <section className="py-16">
-        <h2 className="text-center text-4xl font-bold mb-16">Why use Bookfolio?</h2>
+        <h2 className="text-center text-4xl font-bold mb-16">Why use MyReadings?</h2>
 
         {/* Container 1 - Record Reads */}
         <div className="flex items-center justify-evenly mb-16">

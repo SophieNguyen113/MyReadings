@@ -5,9 +5,9 @@ export default function UserAvatar() {
 
   const user = {
     avatarUrl:
-      "https://avatars.githubusercontent.com/u/111645165?v=4",
-    username: "junjhon12",
-    name: "Quoc Bao Dinh Le",
+      "https://avatars.githubusercontent.com/u/9919?s=280&v=4",
+    username: "Username",
+    name: "Name",
   };
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
