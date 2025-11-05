@@ -157,7 +157,7 @@ const dropTable = async () => {
       DROP TABLE IF EXISTS Collection;
 
       DROP TABLE IF EXISTS User_Book;
-      
+
       DROP TABLE IF EXISTS languages;
       DROP TABLE IF EXISTS users;
       DROP TABLE IF EXISTS Book;
@@ -184,3 +184,5 @@ const setup = async () => {
 };
 
 setup();
+
+// made some errors
