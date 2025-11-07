@@ -25,6 +25,112 @@ const createUsersTable = async () => {
   }
 };
 
+const createUserLibraryTable = async () => {
+  try {
+    const createUserLibraryTableQuery = `
+      DROP TABLE IF EXISTS user_library;
+      
+      CREATE TABLE IF NOT EXISTS user_library (
+        id SERIAL PRIMARY KEY,
+        user_id INT NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        author VARCHAR(255) NOT NULL,
+        genre VARCHAR(100),
+        description TEXT,
+        rating DECIMAL(3,2),
+        reading_status VARCHAR(50),
+        favorite BOOLEAN DEFAULT FALSE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      );
+    `;
+    await pool.query(createUserLibraryTableQuery);
+    console.log("✅ Table user_library created successfully");
+  } catch (err) {
+    console.log("❌ Failed to create user_library table");
+    console.error(err);
+  }
+};
+
+const createBooksTable = async () => {
+  try {
+    const createBooksTableQuery = `
+      DROP TABLE IF EXISTS books;
+     
+      CREATE TABLE IF NOT EXISTS books (
+        id VARCHAR(255) PRIMARY KEY,
+        authors TEXT,
+        title TEXT,
+        image TEXT,
+        description TEXT,
+        pagecount INTEGER,
+        language VARCHAR(255)
+      ); 
+    `;
+    await pool.query(createBooksTableQuery);
+    console.log(`✅ Table books created successfully`);
+  } catch (err) {
+    console.log("❌ failed to createBooksTable");
+    console.error(err);
+  }
+};
+
+const createUsersBooksTable = async () => {
+  try {
+    const createUsersBooksTableQuery = `
+      DROP TABLE IF EXISTS users_books;
+
+      CREATE TABLE IF NOT EXISTS users_books (
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        book_id VARCHAR(255) REFERENCES books(id) ON DELETE CASCADE,
+        pagesread INTEGER NOT NULL,
+        PRIMARY KEY (user_id, book_id)
+      );
+    `;
+    await pool.query(createUsersBooksTableQuery);
+    console.log(`✅ Table users_books created successfully`);
+  } catch (err) {
+    console.log("❌ failed to createUsersBooksTable");
+    console.error(err);
+  }
+};
+
+const createCategoriesTable = async () => {
+  try {
+    const createCategoriesBooksTableQuery = `
+      DROP TABLE IF EXISTS categories;
+
+      CREATE TABLE IF NOT EXISTS categories (
+        id SERIAL PRIMARY KEY,
+        category_name VARCHAR(255) NOT NULL
+      );
+    `;
+    await pool.query(createCategoriesBooksTableQuery);
+    console.log(`✅ Table categories created successfully`);
+  } catch (err) {
+    console.log("❌ failed to createCatagoriesTable");
+    console.error(err);
+  }
+};
+
+const createCategoriesBooksTable = async () => {
+  try {
+    const createCategoriesBooksTableQuery = `
+      DROP TABLE IF EXISTS categories_books;
+
+      CREATE TABLE IF NOT EXISTS categories_books (
+        book_id VARCHAR(255) REFERENCES books(id) ON DELETE CASCADE,
+        category_id INTEGER REFERENCES categories(id) ON DELETE CASCADE,
+        PRIMARY KEY (book_id, category_id)
+      );
+    `;
+    await pool.query(createCategoriesBooksTableQuery);
+    console.log(`✅ Table categories_books created successfully`);
+  } catch (err) {
+    console.log("❌ failed to createCategoriesBooksTable");
+    console.error(err);
+  }
+};
+
 const createLanguagesTable = async () => {
   try {
     const createLanguagesTableQuery = `
@@ -60,92 +166,21 @@ const insertLanguages = async () => {
   }
 };
 
-const createBook_Table = async () => {
+const createUsersBooksRecTable = async () => {
   try {
-    const createBookTableQuery = `
-      DROP TABLE IF EXISTS Book;
-      
-      CREATE TABLE Book (
-        id SERIAL PRIMARY KEY,
-        title VARCHAR(255) NOT NULL,
-        author VARCHAR(255) NOT NULL,
-        genre VARCHAR(100),
-        description TEXT     
-        ); 
-    `;
-    await pool.query(createBookTableQuery);
-    console.log(`✅ Table Book created successfully`);
-  } catch (err) {
-    console.log("❌ Failed to create Book Table");
-    console.error(err);
-  }
-};
+    const createUsersBooksRecTableQuery = `
+      DROP TABLE IF EXISTS users_books_rec;
 
-const createUser_Book_Table = async () => {
-  try {
-    const createUser_BookTableQuery = `
-      DROP TABLE IF EXISTS User_Book;
-      
-      CREATE TABLE IF NOT EXISTS User_Book (
-        user_id INT NOT NULL,
-        book_id INT NOT NULL,
-        rating INT CHECK (rating BETWEEN 1 AND 5),
-        review TEXT,
-        reading_status VARCHAR(20) CHECK (reading_status IN ('reading','finished','to-read')),
-        book_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        date_read DATE,
-        PRIMARY KEY (user_id, book_id),
-        FOREIGN KEY (user_id) REFERENCES users(id) on DELETE CASCADE,
-        FOREIGN KEY (book_id) REFERENCES book(id) on DELETE CASCADE
+      CREATE TABLE IF NOT EXISTS users_books_rec (
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        book_id VARCHAR(255) REFERENCES books(id) ON DELETE CASCADE,
+        PRIMARY KEY (user_id, book_id)
       );
     `;
-    await pool.query(createUser_BookTableQuery);
-    console.log(`✅ Table User_book created successfully`);
+    await pool.query(createUsersBooksRecTableQuery);
+    console.log(`✅ Table users_books_rec created successfully`);
   } catch (err) {
-    console.log("❌ failed to create User_BookTable");
-    console.error(err);
-  }
-};
-
-
-const createCollection_Table = async () => {
-  try {
-    const createCollection_TableQuery = `
-      DROP TABLE IF EXISTS Collection;
-      
-      CREATE TABLE IF NOT EXISTS Collection (
-        id SERIAL PRIMARY KEY,
-        user_id INTEGER NOT NULL,
-        name VARCHAR(255) NOT NULL,
-        description TEXT,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-      );
-    `;
-    await pool.query(createCollection_TableQuery);
-    console.log(`✅ Collection Table created successfully`);
-  } catch (err) {
-    console.log("❌ Failed to create Collection Table");
-    console.error(err);
-  }
-};
-
-const createColection_Book_Table = async () => {
-  try {
-    const createCollection_Book_TableQuery = `
-      DROP TABLE IF EXISTS Collection_Book;
-      
-      CREATE TABLE IF NOT EXISTS Collection_Book (
-        collection_id INT NOT NULL,
-        book_id INT NOT NULL,
-        PRIMARY KEY (collection_id, book_id),
-        FOREIGN KEY (collection_id) REFERENCES Collection(id) ON DELETE CASCADE,
-        FOREIGN KEY (book_id) REFERENCES book(id) ON DELETE CASCADE
-      );
-    `;
-    await pool.query(createCollection_Book_TableQuery);
-    console.log(`✅ Table Collection_Book created successfully`);
-  } catch (err) {
-    console.log("❌ Failed to create Collection_Book table");
+    console.log("❌ failed to createUsersBooksRecTable");
     console.error(err);
   }
 };
@@ -153,14 +188,14 @@ const createColection_Book_Table = async () => {
 const dropTable = async () => {
   try {
     const dropTableQuery = `
-      DROP TABLE IF EXISTS Collection_Book;
-      DROP TABLE IF EXISTS Collection;
-
-      DROP TABLE IF EXISTS User_Book;
-
+      DROP TABLE IF EXISTS users_books;
+      DROP TABLE IF EXISTS user_library;
+      DROP TABLE IF EXISTS users_books_rec;
+      DROP TABLE IF EXISTS categories_books;
+      DROP TABLE IF EXISTS books;
       DROP TABLE IF EXISTS languages;
       DROP TABLE IF EXISTS users;
-      DROP TABLE IF EXISTS Book;
+      DROP TABLE IF EXISTS categories;
     `;
 
     await pool.query(dropTableQuery);
@@ -174,15 +209,14 @@ const dropTable = async () => {
 const setup = async () => {
   await dropTable();
   await createUsersTable();
+  await createUserLibraryTable();
+  await createBooksTable();
+  await createUsersBooksTable();
+  await createUsersBooksRecTable();
+  await createCategoriesTable();
+  await createCategoriesBooksTable();
   await createLanguagesTable();
   await insertLanguages();
-
-  await createBook_Table();
-  await createUser_Book_Table();
-  await createCollection_Table();
-  await createColection_Book_Table();
 };
 
 setup();
-
-// made some errors
