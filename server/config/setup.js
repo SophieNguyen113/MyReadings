@@ -65,13 +65,13 @@ const createBook_Table = async () => {
     const createBookTableQuery = `
       DROP TABLE IF EXISTS Book;
       
-      CREATE TABLE IF NOT EXISTS Book (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+      CREATE TABLE Book (
+        id SERIAL PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
         author VARCHAR(255) NOT NULL,
         genre VARCHAR(100),
-        description TEXT,
-      ); 
+        description TEXT     
+        ); 
     `;
     await pool.query(createBookTableQuery);
     console.log(`✅ Table Book created successfully`);
@@ -91,11 +91,11 @@ const createUser_Book_Table = async () => {
         book_id INT NOT NULL,
         rating INT CHECK (rating BETWEEN 1 AND 5),
         review TEXT,
-        reading_status VARCHAR(20) CHECK (reading_status IN ('reading','finished','to-read)),
+        reading_status VARCHAR(20) CHECK (reading_status IN ('reading','finished','to-read')),
         book_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         date_read DATE,
         PRIMARY KEY (user_id, book_id),
-        FOREIGN KEY (user_id) REFERENCES "User"(id) on DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) on DELETE CASCADE,
         FOREIGN KEY (book_id) REFERENCES book(id) on DELETE CASCADE
       );
     `;
@@ -114,7 +114,7 @@ const createCollection_Table = async () => {
       DROP TABLE IF EXISTS Collection;
       
       CREATE TABLE IF NOT EXISTS Collection (
-        id INT SERIAL PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         user_id INTEGER NOT NULL,
         name VARCHAR(255) NOT NULL,
         description TEXT,
@@ -153,13 +153,14 @@ const createColection_Book_Table = async () => {
 const dropTable = async () => {
   try {
     const dropTableQuery = `
+      DROP TABLE IF EXISTS Collection_Book;
+      DROP TABLE IF EXISTS Collection;
+
+      DROP TABLE IF EXISTS User_Book;
+
       DROP TABLE IF EXISTS languages;
       DROP TABLE IF EXISTS users;
-
       DROP TABLE IF EXISTS Book;
-      DROP TABLE IF EXISTS User_Book;
-      DROP TABLE IF EXISTS Collection;
-      DROP TABLE IF EXISTS Collection_Book;
     `;
 
     await pool.query(dropTableQuery);
@@ -183,3 +184,5 @@ const setup = async () => {
 };
 
 setup();
+
+// made some errors
