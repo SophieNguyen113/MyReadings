@@ -1,22 +1,18 @@
 import { useState, useEffect } from "react";
 
 export default function Home_Books({ api_url }) {
+  const [showAddBook, setShowAddBook] = useState(false);
+  const [showLibrary, setShowLibrary] = useState(false);
   const [books, setBooks] = useState([]);
-  const [form, setForm] = useState({
-    title: "",
-    author: "",
-    genre: "",
-    description: "",
-    rating: "",
-    reading_status: "",
-  });
   const [editingBookId, setEditingBookId] = useState(null);
 
+  // Fetch books from backend
   const fetchBooks = async () => {
     try {
       const res = await fetch(`${api_url}/api/user_library`, {
         credentials: "include",
       });
+
       const data = await res.json();
       setBooks(data.books || []);
     } catch (err) {
@@ -28,12 +24,8 @@ export default function Home_Books({ api_url }) {
     fetchBooks();
   }, []);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Add or update book
+  const handleSubmit = async (formData) => {
     try {
       const method = editingBookId ? "PUT" : "POST";
       const endpoint = editingBookId
@@ -44,202 +36,309 @@ export default function Home_Books({ api_url }) {
         method,
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(form)
+        body: JSON.stringify(formData),
       });
 
-      const data = await res.json();
       if (res.ok) {
         fetchBooks();
-        setForm({
-          title: "",
-          author: "",
-          genre: "",
-          description: "",
-          rating: "",
-          reading_status: "",
-        });
         setEditingBookId(null);
+        setShowAddBook(false);
       } else {
-        console.error(data.error || "Error submitting form");
+        console.error("Error saving");
       }
     } catch (err) {
-      console.error("Error submitting book", err);
+      console.error("Error submitting", err);
     }
   };
 
-  const handleEdit = (book) => {
-    setForm(book);
-    setEditingBookId(book.id);
-  };
-
-  const handleDelete = async (id) => {
+  // Delete book
+  const handleDeleteBook = async (id) => {
     try {
       const res = await fetch(`${api_url}/api/user_library/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
-      const data = await res.json();
-      if (res.ok) {
-        fetchBooks();
-      } else {
-        console.error(data.error || "Error deleting");
-      }
+
+      if (res.ok) fetchBooks();
     } catch (err) {
-      console.error("Error deleting book", err);
+      console.error("Error deleting", err);
     }
   };
 
-  const handleFavorite = async (bookId) => {
+  // Edit button
+  const handleEditBook = (book) => {
+    setEditingBookId(book.id);
+    setShowAddBook(true);
+  };
+
+  // Favorite
+  const handleFavorite = async (id) => {
     try {
-      const res = await fetch(`${api_url}/api/user_library/${bookId}/favorite`, {
+      const res = await fetch(`${api_url}/api/user_library/${id}/favorite`, {
         method: "POST",
         credentials: "include",
       });
-      const data = await res.json();
-      if (res.ok) {
-        fetchBooks();
-      } else {
-        console.error(data.error || "Error marking as favorite");
-      }
+
+      if (res.ok) fetchBooks();
     } catch (err) {
-      console.error("Error marking book as favorite", err);
+      console.error("Error marking favorite", err);
     }
   };
 
+  const recentlyAdded = books.slice(0, 6);
+
   return (
-    <div className="p-4 max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">
-        {editingBookId ? "Edit Book" : "Add a Book"}
-      </h2>
+    <div className="min-h-screen text-center p-8"> 
+      {/* Welcome Section */}
+      <div className="max-w-4xl mx-auto mt-10">
+        <h1 className="text-3xl font-bold mb-8">
+          Create your personal reading universe
+        </h1>
 
-      <form onSubmit={handleSubmit} className="mb-6 space-y-4 bg-gray-100 p-4 rounded shadow">
-        <div>
-          <input
-            type="text"
-            name="title"
-            placeholder="Title"
-            value={form.title}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-        </div>
-        <div>
-          <input
-            type="text"
-            name="author"
-            placeholder="Author"
-            value={form.author}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-        </div>
-        <div>
-          <input
-            type="text"
-            name="genre"
-            placeholder="Genre"
-            value={form.genre}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-        </div>
-        <div>
-          <input
-            type="text"
-            name="description"
-            placeholder="Description"
-            value={form.description}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-        </div>
-        <div>
-          <select
-            name="rating"
-            value={form.rating}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border border-gray-300 rounded"
-          >
-            <option value="">Select Rating</option>
-            {[1, 2, 3, 4, 5].map((num) => (
-              <option key={num} value={num}>
-                {num}
-              </option>
+        <div className="mb-8"></div>
+
+        <p className="text-lg mb-8 ">
+          Add your books with title, author, genre, description, rating, and
+          status. Never lose track of your favorite reads again! Keep track of
+          what you are reading and what you've completed in your library.
+        </p>
+
+        
+        <div className="mb-8"></div>
+
+            {/* Buttons */}
+      <div className="flex justify-center gap-6 mb-12">
+        <button
+          onClick={() => {
+            setEditingBookId(null);
+            setShowAddBook(true);
+          }}
+          className="bg-indigo-100 hover:bg-indigo-200 text-gray-800 font-medium py-3 px-8 rounded-xl shadow-sm transition"
+        >
+          Add a Book 📖
+        </button>
+      </div>
+
+
+        <div className="mb-8"></div>
+
+        {books.length === 0 ? (
+          <p className="text-gray-600 text-lg">No books added yet.</p>
+        ) : (
+          <div className="grid grid-cols-4 gap-2">
+            {books.map((book) => (
+              <div
+                key={book.id}
+                className="bg-white/80 border border-gray-200 p-5 rounded-xl shadow-sm hover:shadow-md transition"
+              >
+                <h4 className="font-bold text-lg mb-1 text-gray-900">
+                  {book.title}
+                </h4>
+
+                <p className="text-gray-700 mb-1">
+                  <span className="font-medium">Author:</span>{" "}
+                  {book.author}
+                </p>
+
+                {book.genre && (
+                  <p className="text-gray-700 mb-1">
+                    <span className="font-medium">Genre:</span>{" "}
+                    {book.genre}
+                  </p>
+                )}
+
+                <p className="text-gray-700 mb-1">
+                  <span className="font-medium">Rating:</span>{" "}
+                  {"⭐".repeat(book.rating)}
+                </p>
+
+                <p className="text-gray-700 mb-1">
+                  <span className="font-medium">Status:</span>{" "}
+                  {book.reading_status}
+                </p>
+
+                {book.description && (
+                  <p className="text-gray-600 text-sm mt-2">
+                    {book.description.length > 100
+                      ? book.description.slice(0, 100) + "..."
+                      : book.description}
+                  </p>
+                )}
+
+                <p className="text-gray-700 mb-1">
+                  <span className="font-medium">Favorite:</span>{" "}
+                  {book.favorite ? "❤️ Yes" : "🤍 No"}
+                </p>
+
+                <div className="flex justify-between mt-3 gap-3">
+                  <button
+                    onClick={() => handleEditBook(book)}
+                    className="px-3 py-1 bg-blue-500 rounded-lg hover:bg-blue-600 text-sm text-white"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    onClick={() => handleDeleteBook(book.id)}
+                    className="px-3 py-1 bg-red-400 text-white rounded-lg hover:bg-red-500 text-sm"
+                  >
+                    Delete
+                  </button>
+
+                  <button
+                    onClick={() => handleFavorite(book.id)}
+                    className={`px-3 py-1 rounded-lg text-sm transition ${
+                      book.favorite
+                        ? "bg-purple-600 hover:bg-purple-700 text-white"
+                        : "bg-yellow-500 hover:bg-yellow-600 text-white"
+                    }`}
+                  >
+                    {book.favorite ? "❤️ Saved" : "🤍 Save"}
+                  </button>
+                </div>
+              </div>
             ))}
-          </select>
-        </div>
-        <div>
-          <select
-            name="reading_status"
-            value={form.reading_status}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border border-gray-300 rounded"
-          >
-            <option value="">Select Status</option>
-            <option value="Reading">Reading</option>
-            <option value="Completed">Completed</option>
-          </select>
-        </div>
-        <div>
-          <button
-            type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            {editingBookId ? "Update" : "Add"}
-          </button>
-        </div>
-      </form>
+          </div>
+        )}
+      </div>
 
-      <h2 className="text-2xl font-bold mb-4">Your Library</h2>
-      {books.length === 0 ? (
-        <p>No books found.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6">
-          {books.map((book) => (
-            <div key={book.id} className="bg-white rounded-xl shadow-md p-4 space-y-2">
-              <div className="text-left space-y-1">
-                <h3 className="text-lg font-semibold">{book.title}</h3>
-                <p><span className="font-semibold text-gray-500">Author:</span> {book.author}</p>
-                <p><span className="font-semibold text-gray-500">Genre:</span> {book.genre}</p>
-                <p><span className="font-semibold text-gray-500">Rating:</span> {book.rating}</p>
-                <p><span className="font-semibold text-gray-500">Description:</span> {book.description || "No description."}</p>
-                <p><span className="font-semibold text-gray-500">Status:</span> {book.reading_status}</p>
-                <p><span className="font-semibold text-gray-500">Favorite:</span> {book.favorite ? "Yes" : "No"}</p>
-              </div>
+      <div className="mb-8"></div>
 
-              <div className="flex justify-between mt-3 space-x-2">
+
+      {/* Add Book Model */}
+      {showAddBook && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50 px-4">
+          <div className="bg-gray-50 border border-gray-200 p-10 rounded-3xl shadow-lg w-full max-w-2xl text-left">
+            <h2 className="text-3xl font-semibold mb-6 text-gray-600">
+              {editingBookId ? "Edit Book" : "Add a New Book"}
+            </h2>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const data = new FormData(e.target);
+
+                handleSubmit({
+                  title: data.get("title"),
+                  author: data.get("author"),
+                  genre: data.get("genre"),
+                  rating: parseInt(data.get("rating")),
+                  reading_status: data.get("reading_status"),
+                  description: data.get("description"),
+                });
+
+                e.target.reset();
+              }}
+              className="space-y-5"
+            >
+              <input
+                name="title"
+                placeholder="Book Title"
+                defaultValue={
+                  editingBookId
+                    ? books.find((b) => b.id === editingBookId)?.title
+                    : ""
+                }
+                className="border border-gray-300 p-5 rounded-lg w-full focus:outline-indigo-400 text-lg"
+                required
+              />
+
+              <input
+                name="author"
+                placeholder="Author"
+                defaultValue={
+                  editingBookId
+                    ? books.find((b) => b.id === editingBookId)?.author
+                    : ""
+                }
+                className="border border-gray-300 p-5 rounded-lg w-full focus:outline-indigo-400 text-lg"
+                required
+              />
+
+              <input
+                name="genre"
+                placeholder="Genre"
+                defaultValue={
+                  editingBookId
+                    ? books.find((b) => b.id === editingBookId)?.genre
+                    : ""
+                }
+                className="border border-gray-300 p-5 rounded-lg w-full focus:outline-indigo-400 text-lg"
+              />
+
+              <select
+                name="rating"
+                defaultValue={
+                  editingBookId
+                    ? books.find((b) => b.id === editingBookId)?.rating
+                    : ""
+                }
+                className="border border-gray-300 p-5 rounded-lg w-full focus:outline-indigo-400 text-lg"
+                required
+              >
+                <option value="" disabled>
+                  Rating (1–5)
+                </option>
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                name="reading_status"
+                defaultValue={
+                  editingBookId
+                    ? books.find((b) => b.id === editingBookId)?.reading_status
+                    : ""
+                }
+                className="border border-gray-300 p-5 rounded-lg w-full focus:outline-indigo-400 text-lg"
+                required
+              >
+                <option value="" disabled>
+                  Reading Status
+                </option>
+                <option value="Reading">Reading</option>
+                <option value="Completed">Completed</option>
+              </select>
+
+              <textarea
+                name="description"
+                placeholder="Description"
+                rows="6"
+                defaultValue={
+                  editingBookId
+                    ? books.find((b) => b.id === editingBookId)?.description
+                    : ""
+                }
+                className="border border-gray-300 p-5 rounded-lg w-full focus:outline-indigo-400 text-lg"
+              ></textarea>
+
+              <div className="flex justify-end gap-4 pt-4">
                 <button
-                  onClick={() => handleEdit(book)}
-                  className="flex-1 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm"
+                  type="button"
+                  onClick={() => setShowAddBook(false)}
+                  className="px-6 py-3 bg-gray-200 rounded-lg hover:bg-gray-300"
                 >
-                  Edit
+                  Cancel
                 </button>
+
                 <button
-                  onClick={() => handleDelete(book.id)}
-                  className="flex-1 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
+                  type="submit"
+                  className="px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition"
                 >
-                  Delete
-                </button>
-                <button
-                onClick={() => handleFavorite(book.id)}
-                className={`flex-1 px-3 py-1 rounded text-sm transition-colors duration-200 ${
-                  book.favorite
-                    ? "bg-purple-600 hover:bg-purple-700 text-white"
-                    : "bg-yellow-500 hover:bg-yellow-600 text-white"
-                }`}
-                >
-                  {book.favorite ? "❤️ Saved" : "🤍 Save"}
+                  {editingBookId ? "Save Changes" : "Saved"}
                 </button>
               </div>
-            </div>
-          ))}
+            </form>
+          </div>
         </div>
       )}
+
+      
+
+    
     </div>
   );
 }
