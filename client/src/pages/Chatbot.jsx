@@ -210,66 +210,70 @@ export default function Chatbot({ api_url }) {
   };
 
   return (
-    <div className="flex flex-col h-screen max-w-4xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Book Recommendation Chatbot</h1>
-      
-      {/* Messages container */}
-      <div className="flex-1 overflow-y-auto mb-4 p-4 border rounded-lg bg-gray-50">
-        {messages.map((message, index) => (
-          <div 
-            key={index} 
-            className={`mb-4 p-3 rounded-lg ${
-              message.role === 'user' 
-                ? 'bg-blue-100 ml-auto max-w-[80%]' 
-                : 'bg-white border max-w-[80%]'
-            }`}
-          >
-            <p className="text-sm font-semibold mb-1 text-black">
-              {message.role === 'user' ? 'You' : 'Book Assistant'}
-            </p>
-            <ReactMarkdown
-              components={{
-                p: ({node, ...props}) => <p className="text-black text-sm mb-2" {...props} />,
-                h3: ({node, ...props}) => <h3 className="text-lg font-bold mt-4 mb-2 text-black" {...props} />,
-                em: ({node, ...props}) => <em className="italic text-black" {...props} />,
-                strong: ({node, ...props}) => <strong className="font-semibold text-black" {...props} />,
-                ul: ({node, ...props}) => <ul className="list-disc ml-6 text-black" {...props} />,
-                li: ({node, ...props}) => <li className="mb-1 text-black" {...props} />
-              }}
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-amber-50 pt-24 pb-12">
+      <div className="container mx-auto px-6">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold mb-6 text-amber-900">Book Recommendation Chatbot</h1>
+        
+          {/* Messages container */}
+          <div className="h-[60vh] overflow-y-auto mb-6 p-6 bg-white rounded-xl shadow-md border border-amber-100">
+          {messages.map((message, index) => (
+            <div 
+              key={index} 
+              className={`mb-4 p-4 rounded-xl border ${
+                message.role === 'user' 
+                  ? 'bg-amber-50 border-amber-200 ml-auto max-w-[80%]' 
+                  : 'bg-white border-amber-100 max-w-[80%]'
+              }`}
             >
-              {message.content}
-            </ReactMarkdown>
+              <p className="text-sm font-semibold mb-2 text-amber-900">
+                {message.role === 'user' ? 'You' : 'Book Assistant'}
+              </p>
+              <ReactMarkdown
+                components={{
+                  p: ({node, ...props}) => <p className="text-amber-900/90 text-sm mb-2" {...props} />,
+                  h3: ({node, ...props}) => <h3 className="text-lg font-bold mt-4 mb-2 text-amber-900" {...props} />,
+                  em: ({node, ...props}) => <em className="italic text-amber-900" {...props} />,
+                  strong: ({node, ...props}) => <strong className="font-semibold text-amber-900" {...props} />,
+                  ul: ({node, ...props}) => <ul className="list-disc ml-6 text-amber-900" {...props} />,
+                  li: ({node, ...props}) => <li className="mb-1 text-amber-900" {...props} />
+                }}
+              >
+                {message.content}
+              </ReactMarkdown>
+            </div>
+          ))}
+          
+          {isLoading && (
+            <div className="bg-white border border-amber-100 p-4 rounded-xl max-w-[80%] mb-4 shadow-sm">
+              <p className="text-sm font-semibold mb-2 text-amber-900">Book Assistant</p>
+              <p className="text-amber-900/80">Thinking...</p>
+            </div>
+          )}
+          
+          <div ref={messagesEndRef} />
           </div>
-        ))}
         
-        {isLoading && (
-          <div className="bg-white border p-3 rounded-lg max-w-[80%] mb-4">
-            <p className="text-sm font-semibold mb-1">Book Assistant</p>
-            <p>Thinking...</p>
-          </div>
-        )}
-        
-        <div ref={messagesEndRef} />
+          {/* Input form */}
+          <form onSubmit={handleSendMessage} className="flex gap-3">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask for recommendations, summaries, or themes..."
+              className="flex-1 p-4 bg-white text-amber-900 placeholder:text-amber-400 border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-300 shadow-sm"
+              disabled={isLoading}
+            />
+            <button 
+              type="submit" 
+              className="px-6 py-3 bg-amber-600 text-white rounded-xl shadow-sm hover:bg-amber-700 disabled:bg-amber-300"
+              disabled={isLoading || !input.trim()}
+            >
+              Send
+            </button>
+          </form>
+        </div>
       </div>
-      
-      {/* Input form */}
-      <form onSubmit={handleSendMessage} className="flex gap-2">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask for book recommendations, summaries, or discussions..."
-          className="flex-1 p-2 border rounded-lg text-white"
-          disabled={isLoading}
-        />
-        <button 
-          type="submit" 
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg disabled:bg-blue-300"
-          disabled={isLoading || !input.trim()}
-        >
-          Send
-        </button>
-      </form>
     </div>
   );
 }

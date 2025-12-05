@@ -17,34 +17,34 @@ export default function UserAvatar() {
       <img
         src={user.avatarUrl}
         alt="User Avatar"
-        className="w-10 h-10 object-cover rounded-full cursor-pointer border border-gray-300"
+        className="w-10 h-10 object-cover rounded-full cursor-pointer border border-amber-200 shadow-sm hover:shadow-md transition"
         onClick={toggleModal}
       />
 
       {isModalOpen && (
         <div
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+          className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50"
           onClick={toggleModal}
         >
           <div
-            className="bg-white p-8 rounded-2xl shadow-2xl w-80 text-black relative"
+            className="bg-white p-8 rounded-2xl shadow-md w-80 text-amber-900 relative border border-amber-100"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-2xl font-semibold text-center mb-6">User Information</h2>
+            <h2 className="text-2xl font-semibold text-center mb-6 text-amber-900">User Information</h2>
 
             <img
               src={user.avatarUrl}
               alt="User Avatar"
-              className="w-24 h-24 object-cover rounded-full mx-auto border-4 border-gray-200 mb-4"
+              className="w-24 h-24 object-cover rounded-full mx-auto ring-4 ring-amber-200 mb-4"
             />
 
             <div className="text-center">
-              <p className="text-lg font-medium">{user.name}</p>
-              <p className="text-gray-500">@{user.username}</p>
+              <p className="text-lg font-medium text-amber-900">{user.name}</p>
+              <p className="text-amber-700/80">@{user.username}</p>
             </div>
 
             <button
-              className="mt-6 w-full px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              className="mt-6 w-full px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition"
               onClick={toggleModal}
             >
               Close
