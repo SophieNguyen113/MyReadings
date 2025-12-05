@@ -51,7 +51,7 @@ export default function Searchbar({ children }) {
       {/* Search Tips */}
       <div className="mt-3 text-center">
         <p className="text-sm text-gray-600">
-          💡 Try searching for "fiction", "science", or your favorite author
+          💡 Try searching for your favorite books by title, category, or keyword
         </p>
       </div>
     </form>

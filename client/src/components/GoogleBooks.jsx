@@ -83,9 +83,6 @@ export default function GoogleBooks({api_url}) {
         <h2 className="text-2xl font-bold text-amber-900">
           {selectedCategory && selectedCategory !== "All" ? `${selectedCategory} Books` : "Search Results"}
         </h2>
-        <div className="text-sm text-gray-600">
-          Showing {booksToDisplay.length} {booksToDisplay.length === 1 ? "result" : "results"}
-        </div>
       </div>
 
       {/* Books Grid */}

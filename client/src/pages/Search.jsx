@@ -9,7 +9,7 @@ export default function Search({api_url}) {
         
         {/* Search Bar */}
         <div className="mb-8">
-          <Searchbar>Search for books by title, author, or keyword...</Searchbar>
+          <Searchbar>Searching for books...</Searchbar>
         </div>
 
         {/* Two Column Layout */}
