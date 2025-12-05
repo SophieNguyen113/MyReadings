@@ -34,7 +34,7 @@ export default function Nav({ user, api_url }) {
                   }`
                 }
               >
-                Home
+                🏠 Home
               </NavLink>
             </li>
             <li>
@@ -48,7 +48,7 @@ export default function Nav({ user, api_url }) {
                   }`
                 }
               >
-                Search
+                🔎 Search
               </NavLink>
             </li>
             <li>
@@ -85,7 +85,7 @@ export default function Nav({ user, api_url }) {
                 onClick={logout}
                 className="px-5 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all duration-200 cursor-pointer"
               >
-                Logout
+                ↪️ Logout
               </a>
             </li>
           </>
