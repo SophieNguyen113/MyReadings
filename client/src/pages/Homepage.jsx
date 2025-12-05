@@ -7,10 +7,7 @@ export default function Homepage({api_url}) {
       <section className="container mx-auto px-6 py-20 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-6xl font-bold text-amber-900 mb-6 leading-tight">
-            Your Personal Library,
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600">
-              Digitally Reimagined
-            </span>
+            Your Personal Library, Simplified
           </h1>
           <p className="text-xl text-gray-700 mb-8 leading-relaxed max-w-2xl mx-auto">
             MyReadings is your companion for tracking every book you read, discovering your next favorite story, 
@@ -182,7 +179,6 @@ export default function Homepage({api_url}) {
             </svg>
             <span>Join with GitHub - It's Free</span>
           </a>
-          <p className="text-amber-200 mt-6 text-sm">No credit card required • Setup in 2 minutes</p>
         </div>
       </section>
 
