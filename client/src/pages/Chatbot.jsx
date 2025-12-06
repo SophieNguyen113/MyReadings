@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import OpenAI from 'openai';
 import ReactMarkdown from 'react-markdown';
 
 export default function Chatbot({ api_url }) {
@@ -10,15 +9,6 @@ export default function Chatbot({ api_url }) {
   const [userPreferences, setUserPreferences] = useState(null);
   const [savedBooks, setSavedBooks] = useState([]);
   const messagesEndRef = useRef(null);
-
-  const deepSeekApiKey = import.meta.env.VITE_PUBLIC_DEEPSEEK_API_KEY;
-  
-  // Initialize OpenAI client with DeepSeek configuration
-  const openai = new OpenAI({
-    baseURL: 'https://api.deepseek.com',
-    apiKey: deepSeekApiKey,
-    dangerouslyAllowBrowser: true // Required for client-side usage
-  });
   
   // Fetch user preferences and saved books on component mount
   useEffect(() => {
@@ -99,8 +89,7 @@ export default function Chatbot({ api_url }) {
   // Function to send message to DeepSeek API using OpenAI SDK
   const sendToDeepSeek = async (prompt) => {
     try {
-      const completion = await openai.chat.completions.create({
-        model: 'deepseek-chat', // Using DeepSeek-R1 model
+      const payload = {
         messages: [
           {
             role: 'system',
@@ -115,49 +104,60 @@ export default function Chatbot({ api_url }) {
             For book summaries and theme discussions, be concise but informative.
             If the user has no saved books, mention that and provide general recommendations.`
           },
-          {
-            role: 'user',
-            content: prompt
-          }
+          { role: 'user', content: prompt }
         ],
         temperature: 0.7,
         max_tokens: 1000
+      };
+
+      const res = await fetch(`${api_url}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payload)
       });
-      
-      return completion.choices[0].message.content;
+
+      if (!res.ok) {
+        // Bubble up status for specific handling (e.g., 402)
+        const text = await res.text();
+        const err = new Error(text || 'Chat proxy error');
+        err.status = res.status;
+        throw err;
+      }
+
+      const data = await res.json();
+      return data.choices?.[0]?.message?.content || 'No content returned from model';
     } catch (error) {
       console.error('Error calling DeepSeek API:', error);
-      
-      // Check if it's a payment/balance error
+
       if (error.status === 402) {
-        // Create a more personalized fallback response based on saved books
         let fallbackResponse = "I'm sorry, but there seems to be an issue with the API account balance. This is a demo application and the API credits may have been exhausted.\n\n";
-        
+
         if (savedBooks && savedBooks.length > 0) {
           const bookTitles = savedBooks.map(book => book.title || "Unknown Title").join(", ");
           const genres = [...new Set(savedBooks.map(book => book.genre).filter(Boolean))];
           const authors = [...new Set(savedBooks.map(book => book.author).filter(Boolean))];
-          
+
           fallbackResponse += `Based on your saved books (${bookTitles}), `;
-          
+
           if (genres.length > 0) {
             fallbackResponse += `and your interest in ${genres.join(", ")} genres, `;
           }
-          
+
           fallbackResponse += "you might enjoy:\n\n";
-          
+
           if (genres.includes("Classic") || authors.includes("F. Scott Fitzgerald")) {
             fallbackResponse += "- 'Pride and Prejudice' by Jane Austen\n";
           }
-          
+
           if (genres.includes("Dystopian") || authors.includes("George Orwell")) {
             fallbackResponse += "- 'Brave New World' by Aldous Huxley\n";
           }
-          
+
           if (genres.includes("Mystery") || authors.includes("Stephen King")) {
             fallbackResponse += "- 'The Silent Patient' by Alex Michaelides\n";
           }
-          
+
           fallbackResponse += "- 'The Catcher in the Rye' by J.D. Salinger\n";
         } else {
           fallbackResponse += "Since you don't have any saved books yet, here are some general recommendations:\n\n";
@@ -166,10 +166,10 @@ export default function Chatbot({ api_url }) {
           fallbackResponse += "- 'The Great Gatsby' by F. Scott Fitzgerald\n";
           fallbackResponse += "- 'Pride and Prejudice' by Jane Austen\n";
         }
-        
+
         return fallbackResponse;
       }
-      
+
       return 'Sorry, I encountered an error while processing your request. Please try again.';
     }
   };
