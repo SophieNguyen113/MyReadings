@@ -1,5 +1,7 @@
 # MyReadings - A Personalized Book Tracking Website
 
+## Please email nnguyen177@student.gsu.edu for the `.env` keys
+
 ## Team
 - **Sophie Nguyen** 
 - **Khue Nguyen** 
@@ -41,6 +43,7 @@ MyReadings is a web application designed for book enthusiasts to track and manag
    GITHUB_CLIENT_ID=
    GITHUB_CLIENT_SECRET=
    SESSION_SECRET=
+   DEEPSEEK_API_KEY=
    ```
 4. Start the backend server:
    ```sh
@@ -59,7 +62,6 @@ MyReadings is a web application designed for book enthusiasts to track and manag
 3. Create `.env` file:
    ```sh
    VITE_API_KEY=
-   VITE_PUBLIC_DEEPSEEK_API_KEY=
    ```
 4. Start the frontend server:
    ```sh
